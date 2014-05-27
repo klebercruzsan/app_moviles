@@ -1,0 +1,566 @@
+<!DOCTYPE html> 
+<html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $("ul[id*=listavalores] li").click(function () {
+                alert($(this).html()); // gets innerHTML of clicked li
+                alert($(this).text()); // gets text contents of clicked li
+            });
+        });
+</script>
+<title>Validacion de usuarios</title>
+
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+ 
+
+</head>
+ 
+<body>
+
+<div data-role="page" id="inicio">
+ 
+<div data-role="header" >
+	<div class="ui-grid-a">
+    	 <div class="ui-block-a"><img src="http://macrorrueda.macrorruedaecuador.ec/images/ministerio_ecuador.png" width="178" height="141"> </div>
+         <div class="ui-block-b">
+         <img src="http://macrorrueda.macrorruedaecuador.ec/images/proecuador.png" width="189" height="140">
+         
+      </div>
+    </div>
+   <div>
+   <h1>User Authentication</h1>
+   </div>
+</div>
+    <div data-role="content">	
+    <form id="formulario" >
+    <label> User </label>
+    <input type="text" id="nombredeusuario" name="nombredeusuario">
+    <label> Password </label>
+    <input type="password" id="clave" name="clave" >
+    <input type="submit" value="Login" id="botonLogin">
+    </form>	
+    </div>
+</div>
+
+
+<div data-role="page" id="home" data-theme="a">
+     <div data-role="header"  data-theme="b">
+  <h1>Diary</h1>   </div>
+ 	 <div data-role="content" data-theme="e"><h2> Schedules wheel</h2> 
+     <div id="lista"  data-role="content">
+     </div>
+</div>
+<div data-role="footer">
+   			<div data-role="navbar" class="ui-grid-a" data-theme="e" id="boton_agenda">
+	   </div>
+</div>
+</div>
+
+
+<div data-role="page" id="citas" data-theme="a">
+     <div data-role="header" data-theme="b">
+      <a href="#home" >Diary</a>
+      		<h1>Quotations</h1>
+  		</div>
+     <div data-role="content" data-theme="e" id="contenedor_citas">	</div>
+      		<div id="dias_cita"> 
+            </div>
+    		<div id="resultado_cita"> 
+            </div>
+            <div id="Hora_cita"> 
+            </div>
+            <div id="mensaje_cita"> 
+            </div>
+	</div>
+</div>
+
+
+<div data-role="page" id="home1" data-theme="a">
+     <div data-role="header" data-theme="b">
+      <a href="#home" data-rel="back">Diary</a>
+  <h1>Product</h1></div>
+     <div data-role="content" data-theme="e" id="contenedor">	</div>
+
+	</div>
+</div>
+
+
+<div data-role="page" id="registro" data-theme="a">
+     <div data-role="header" data-theme="b">
+     	<a href="#home1" data-rel="back">Product</a>
+     	<h1>Product Registration</h1>
+     </div>
+   	  <div id="lista_reg"  data-role = "content"></div>
+     	<div class="ui-grid-a" id="nom_producto">
+                 <div class="ui-block-a"> 
+                        <label>Short Term</label>
+                 (3 month)</div>
+                <div class="ui-block-b">
+                   <input name="primer" type="text" id="primer" onKeyPress="ValidaSoloNumeros()">
+                </div>
+		  </div>
+              <div class="ui-grid-a">
+				   <div class="ui-block-a">Medium Term (6 month)</div>
+			   <div class="ui-block-b">
+                 <input name="segundo" type="text" id="segundo" onKeyPress="ValidaSoloNumeros()">
+                </div>
+			  </div>
+              <div class="ui-grid-a">
+				   <div class="ui-block-a"> 
+                   		<label> Term (12 month)</label></div>
+			<div class="ui-block-b">
+                   <input name="tercer" type="text" id="tercer" onKeyPress="ValidaSoloNumeros()" >
+              </div>
+			  </div>
+              <div class="ui-grid-solo">
+			<div class="ui-block-a" id="resultado">
+            		
+            </div>
+				</div>
+     
+</div>
+
+
+
+
+</body> 
+
+
+<script>
+
+	var passDataObject2 = {empresas_citas:null}
+
+
+	function carga_datos_citas(empr_ruc_dat,rued_cod_dat)
+	{	var bt_empresa='';
+		var bt_combo_horario='';
+		var dynDiv;
+		var dato_cod_fecha=0;
+		var contador_etiqueta=0;
+		
+		$("#contenedor_citas").empty();
+		$("#resultado_cita").empty();
+	
+		archivoValidacion= "http://demosarn-macrorueda.corpei.ec/mov_val_empresas_citas.php?jsoncallback=?";
+			$.getJSON(archivoValidacion, 
+			{ 	empr_ruc		:empr_ruc_dat,
+				rued_cod  		:  rued_cod_dat	 
+			}
+		  ).done(function(respuestaServer) 
+		 {  for (var i = 0; i < respuestaServer.length; i++) 
+			{ var object = respuestaServer[i];
+ 			 $(jQuery.parseJSON(JSON.stringify(object))).each(function() 
+			   {
+			     bt_empresa=bt_empresa+'<option value="'+this.empr_ruc + '">'+ this.empr_nomb +'</option>';
+			    });						
+			}
+			bt_combo_horario= '<div><label>Empresa: </label><select name="empr_empresa" id="empr_empresa">'+bt_empresa+'</select></div>'
+			$('#resultado_cita').append(bt_combo_horario);			
+				
+		  });
+	
+	// -----  fin de  carga de empresas	
+	
+	
+	//---------------------- carga de datos  horarios ----------------
+	
+	
+	
+			archivoValidacion1 = "http://demosarn-macrorueda.corpei.ec/mov_val_fechas_citas.php?jsoncallback=?";
+		$.getJSON(archivoValidacion1, { 	
+		          				empr_ruc		:empr_ruc_dat,
+								rued_cod  		:  rued_cod_dat	 }
+								
+		  ).done(function(respuestaServer2) {
+					 
+
+		for (var i = 0; i < respuestaServer2.length; i++) 
+		{	  var object = respuestaServer2[i];
+		 	  var bandera_lista = false;
+		     //arreglo json de carga de datos
+			 $(jQuery.parseJSON(JSON.stringify(object))).each(function() {  
+					 var indice = this.indice;
+				     var fecha = this.fecha;
+					 var hora_cod = this.hora_cod;
+					 var hora_deta = this.hora_deta;
+					 if (dato_cod_fecha==this.rued_dia_cod)
+					 {	dato_cod_fecha=this.rued_dia_cod;
+					 	//contador_etiqueta=contador_etiqueta+1;
+				//		if (contador_etiqueta>1)
+					//	{bt_lista= '<label>Fecha: </label>';			
+						//}
+						
+
+						//$(dynDiv).append(bt_lista);
+						
+					 }else
+					   {	dynDiv = document.createElement('div'); 
+					    	dynDiv.setAttribute("data-role","collapsible");
+						dynDiv.setAttribute("class","coll_div");
+						dynDiv.setAttribute("id",this.fecha);
+						dynDiv.innerHTML= '<h3>' + this.fecha;  + '<\h3>';
+						$('#contenedor_citas').append(dynDiv);
+						bt_combo_horario= '<select name="'+ this.fecha +'" id="'+  this.fecha + '">'
+						bt_combo_opciones='<option value="'+this.hora_cod + '">'+ this.hora_deta +' </option>';
+						bt_lista='<div><label>Horario: </label>' + bt_combo_horario + bt_combo_opciones +'</select><label>Empresa: </label></div>';
+						
+						dato_cod_fecha=this.rued_dia_cod;
+					}
+					 
+					 
+					 
+				    
+			 });
+			 //  fin de arreglo JSON-----------------
+			 
+			 
+			// $(dynDiv).append(bt_lista);
+			 
+			 
+	}
+   // fin de  for  de carga del objeto
+$("#contenedor_citas").trigger("create"); 
+//-----------------------------------
+});
+	
+	
+	
+	//------------------------------------------------------------------
+	
+	
+	
+	
+	
+	
+	
+//--------------fin de carga de dataso  del web 	
+		    $("#contenedor_citas").trigger("create"); 
+
+	} //--- fin de función
+
+
+</script>
+
+
+
+
+<script>
+	function almacenar_datos(dat_empr_ruc_o,dat_rued_cod , dat_prod_cod,dat_prod_cod_deta,demandante)
+	{ 
+			
+	
+		var primer_trimestre = $('#primer').val();
+		var segundo_trimestre = $('#segundo').val();
+		var tercer_trimestre =  $('#tercer').val();
+		
+		var archivodatos = "http://demosarn-macrorueda.corpei.ec/mov_val_almacena.php?jsoncallback=?";
+		
+		$.getJSON(archivodatos, { 	empr_ruc_O		:dat_empr_ruc_o,
+									empr_ruc_D		:demandante,
+									rued_cod  		:dat_rued_cod,
+									prod_cod		:dat_prod_cod,
+									prod_cod_deta	:dat_prod_cod_deta,
+									valor1			:primer_trimestre,
+									valor2			:segundo_trimestre,
+								 	valor3			:tercer_trimestre
+								 }
+				  ).done(function(respuestaServer2) {
+					if (this.respuesta==1)
+					{alert('Error en Almacenar los datos');}
+					  
+		
+		});
+		
+		
+		
+	}
+
+</script>
+
+
+<script>
+	$(document).on('pageinit', '#home1', function(e, data){     
+	$(this).find('a').unbind('click').click(function() {
+				    e.preventDefault();
+					
+					if(this.id!='')
+					{  $.mobile.changePage('#registro', { transition: 'flip'} );}
+             
+    });
+});
+
+	
+var passDataObject1 = { 	empr_ruc_O: null , empr_ruc_D:null ,
+								prod_cod:null, prod_deta :null,
+								cod_prod_deta : null, prod_deta_deta :null,
+								rued_cod :null		, demandat :null					
+							}
+
+function cargar_datos_registro(dat_empr_ruc_o,dat_rued_cod,dat_prod_cod,dat_prod_deta,cod_prod_deta,prod_deta_deta,dat_demandante)
+	{	$('#lista_reg').empty();
+		$('#resultado').empty();
+		$('#primer').val(0);
+		$('#segundo').val(0);
+		$('#tercer').val(0);
+		
+
+	
+			
+		var archivodatos = "http://demosarn-macrorueda.corpei.ec/mov_val_retorna_trim.php?jsoncallback=?";
+
+		
+		$.getJSON(archivodatos, { 	empr_ruc_O		:dat_empr_ruc_o,
+									empr_ruc_D		:dat_demandante,
+									rued_cod  		:dat_rued_cod,
+									prod_cod		:dat_prod_cod,
+									prod_cod_deta	:cod_prod_deta
+							     }
+				  ).done(function(respuestaServer) {
+					for (var i = 0; i <= respuestaServer.length; i++) 
+					{	 var object = respuestaServer[i];
+						 $(jQuery.parseJSON(JSON.stringify(object))).each(function()
+						  {  		$('#primer').val(this.valor1);
+									$('#segundo').val(this.valor2);
+									$('#tercer').val(this.valor3);
+			 
+			 			 });			 //  fin de arreglo JSON-----------------
+					}  // fin de  for  de carga del objeto
+				
+		});
+			
+			
+		
+		
+			
+	
+		var dato = '<a href="#home1" data-rel="back" data-role="button" onclick="almacenar_datos('+ "'" + dat_empr_ruc_o  + "',"  +  dat_rued_cod  + "," +  dat_prod_cod + ","  + cod_prod_deta + ",'"  + dat_demandante  + "'"+');"> Actualizar datos </a>';
+		
+		
+		$('#lista_reg').append('<h2>' +  dat_prod_deta   +  '</h2>');
+		$('#lista_reg').append('<h3>' +  prod_deta_deta  +  '</h3>');
+		$('#resultado').append(dato);
+		$('#resultado').trigger("create");
+  	    $('#lista_reg').trigger("create"); 	
+	
+				
+	}
+
+
+</script>
+
+
+
+
+<script>
+function ValidaSoloNumeros() 
+{if ((event.keyCode != 46 && event.keyCode<48 ) || (event.keyCode > 57 && event.keyCode<109 )|| 
+     (event.keyCode > 111 ))						   
+{  event.returnValue = false;}
+
+}
+</script>
+
+
+
+<script>
+
+function cargar_productos(empresa,rueda,demandante)
+{   var demandantes= demandante;
+	passDataObject.ruedaid = rueda;
+  	passDataObject.empr_ruc_O= empresa
+	var dynDiv;
+	var datos='';
+	$("#contenedor").empty();
+archivoValidacion1 = "http://demosarn-macrorueda.corpei.ec/mov_val_producto.php?jsoncallback=?";
+//----- cargo los datos del webservice
+$.getJSON( archivoValidacion1, { empr_ruc:passDataObject.empr_ruc_O,rued_cod:passDataObject.ruedaid }).done(function(respuestaServer1) {
+//------------------recorro lo cargado
+
+
+  var dato_categoria = 0;
+   // for  de carga del objeto
+	for (var i = 0; i < respuestaServer1.length; i++) 
+	{	  var object = respuestaServer1[i];
+		  var bandera_lista = false;
+		     //arreglo json de carga de datos
+			 $(jQuery.parseJSON(JSON.stringify(object))).each(function() {  
+			 	     var indice = this.indice;
+				     var prod_deta = this.prod_deta;
+					 var prod_cod = this.prod_cod;
+					 var prod_deta_deta = this.prod_deta_deta;
+					 var prod_deta_cod = this.prod_deta_cod;
+					 
+				     if (dato_categoria!=prod_cod)
+					 {  dynDiv = document.createElement('div'); 
+					    dynDiv.setAttribute("data-role","collapsible");
+						dynDiv.setAttribute("class","coll_div");
+						dynDiv.setAttribute("id",prod_deta);
+						dynDiv.innerHTML= '<h3>' + prod_deta  + '<\h3>';
+					    
+						var e_fun_registro = 'cargar_datos_registro('+ "'" + passDataObject.empr_ruc_O  + "',"  +   passDataObject.ruedaid + ","  +  prod_cod +  ",'"  +  prod_deta  + "'," +  prod_deta_cod   +  ",'"  +  prod_deta_deta   +  "','" +  demandantes  +  "'"  + ')';
+						
+						var bt_lista='<a data-icon="arrow-r" data-iconpos="right" data-theme="a" ' 			             +'data-role="button" href="#registro" onclick="'+ e_fun_registro +'">'+  
+						prod_deta_deta + '</a>';
+						datos = prod_deta;
+						$(dynDiv).append(bt_lista);
+						
+						$('#contenedor').append(dynDiv);
+						dato_categoria=prod_cod;
+				        bandera_lista=false;
+					 }
+					 else
+			 		 {  pnl = document.getElementById(datos);
+				
+
+						var e_fun_registro = 'cargar_datos_registro('+ "'" + passDataObject.empr_ruc_O  + "',"  +   passDataObject.ruedaid + ","  +  prod_cod +  ",'"  +  prod_deta  + "'," +  prod_deta_cod   +  ",'"  +  prod_deta_deta   +  "','" +  demandantes  +  "'"  + ')';
+
+						var bt_lista='<a data-icon="arrow-r" data-iconpos="right" data-theme="a" ' 			             +'data-role="button" href="#registro" onclick="'+ e_fun_registro +'">'+  
+						prod_deta_deta + '</a>';
+						 
+						$(dynDiv).append(bt_lista);
+						dato_categoria=prod_cod;
+				         bandera_lista=false;
+					}
+			 });
+			 //  fin de arreglo JSON-----------------
+	}
+   // fin de  for  de carga del objeto
+$("#contenedor").trigger("create"); 
+//-----------------------------------
+});
+//--------------fin de carga de dataso  del web 	
+
+ 
+      
+
+}
+</script>
+
+<script>
+
+var passDataObject = { ruedaid: null , empr_ruc_O:null }
+
+ 
+$('#formulario').submit(function() {
+// recolecta los valores que inserto el usuario
+
+ 
+var datosUsuario = $("#nombredeusuario").val();
+var datosPassword = $("#clave").val();
+
+$("#lista").empty();
+var   pnl = document.getElementById('lista');
+
+archivoValidacion = "http://demosarn-macrorueda.corpei.ec/mov_val_usuario.php?jsoncallback=?";
+ 
+$.getJSON( archivoValidacion, { usuario:datosUsuario ,password:datosPassword})
+.done(function(respuestaServer) {
+	
+var empr_ruc='';
+var rued_cod=0;	
+var fecha_tmp='';
+var   pnl = document.getElementById('lista');
+var lista='';
+
+for (var i = 0; i < respuestaServer.length; i++) {
+    var object = respuestaServer[i];
+	
+	
+	$(jQuery.parseJSON(JSON.stringify(object))).each(function() {  
+    var ID = this.indice;
+    var empresa = this.nombre;
+	var fecha = this.fecha;
+	var hora= this.hora_deta; 
+	empr_ruc = this.empr_ruc
+	rued_cod =  this.rued_cod;
+	var demandante= ''; 
+	
+	if (demandante =='') {demandante=this.demandante;}
+		
+
+	
+	if (fecha_tmp=='')
+	{ 
+	var dynDiv = document.createElement("div");
+	var ul = document.createElement("ul");
+	lista="listavalores";
+	ul.setAttribute("data-role","listview");
+	ul.setAttribute("id",lista);
+	ul.setAttribute("data-inset","true");
+	ul.setAttribute("class","list");
+    dynDiv.id = "divDyna";
+	dynDiv.setAttribute("data-role","collapsible");
+	dynDiv.setAttribute("data-collapsed-icon","taifun");
+	dynDiv.setAttribute("data-expanded-icon","taifun");
+	dynDiv.setAttribute("data-inset","false");
+    dynDiv.innerHTML = "<h2>"+ fecha + "</h2>";
+    pnl.appendChild(dynDiv);
+	dynDiv.appendChild(ul);
+	fecha_tmp=fecha;
+	}
+	else
+	 {  if  (fecha_tmp!=fecha)
+	     {
+   
+	lista="listavalores" + i;
+	var dynDiv = document.createElement("div");
+	var ul = document.createElement("ul");
+	ul.setAttribute("data-role","listview");
+	ul.setAttribute("id",lista);
+	ul.setAttribute("data-inset","true");
+	ul.setAttribute("class","art-vmenu");
+	dynDiv.id = "divDyna";
+	dynDiv.setAttribute("data-role","collapsible");
+	dynDiv.setAttribute("data-collapsed-icon","taifun");
+	dynDiv.setAttribute("data-expanded-icon","taifun");
+	dynDiv.setAttribute("data-inset","false");
+    dynDiv.innerHTML = "<h2>"+ fecha + "</h2>";
+	
+    pnl.appendChild(dynDiv);
+	dynDiv.appendChild(ul);
+
+	fecha_tmp=fecha;
+	}
+    else
+	 { 	var dato = "#"+lista;
+	    var bt_lista='<li data-role="list-divider"><a  data-icon="arrow-r" data-iconpos="right" data-theme="a" data-role="button" href="#home1" onclick="cargar_productos(';
+		var bt_cierr = ')">'+ empresa+ '</a><span class="ui-li-count">' + hora  + '</span></li>';
+		 $(dato).append(bt_lista + "'" + empr_ruc  + "','" +  rued_cod  + "','" +  demandante  +"'"+  bt_cierr );
+	 }
+	 }
+	
+	});
+}
+
+$("#boton_agenda").append('<ul><li><a href="#citas" id="citas" data-icon="custom" onClick="carga_datos_citas('+ "'" + empr_ruc + "'" +',' +  rued_cod  +');">Agregar</a></li><li><a href="#noticias" id="noticias" data-icon="custom">Cerrar Sesion</a></li></ul>');
+$.mobile.changePage("#home")
+})
+return false;
+})
+
+$(document).on('pageinit', '#home', function(e, data){     
+	$(this).find('a').unbind('click').click(function() {
+				    e.preventDefault();
+					if(this.id!='')
+					{  $.mobile.changePage('#home1', { transition: 'flip'} );}
+             
+    });
+});
+
+
+
+</script>
+
+
+
+ 
+</body>
+</html>
